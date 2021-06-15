@@ -7235,7 +7235,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb914e9d27345064db68092c06c4cd51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speakName: {fileID: 1007161341}
   speakingName: {fileID: 1610228113}
   nowMusic: {fileID: 107155085}
 --- !u!114 &916310666

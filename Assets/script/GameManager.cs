@@ -12,8 +12,6 @@ public class GameManager : MonoBehaviour
     public Text choose1;
     public Text choose2;
 
-    public Button btn1;
-    public Button btn2;
 
     public CanvasGroup TalkingLogs;
     public CanvasGroup characterPic;
@@ -23,14 +21,9 @@ public class GameManager : MonoBehaviour
 
     public static int times = 1;
 
-    
-    public float charsPerSecond = 0.03f;//打字时间间隔
-    private string words;//保存需要显示的文字
-
     private bool isActive = false;
     private float timer;//计时器
 
-    private int currentPos = 0;//当前打字位置
 
 
     void Start()

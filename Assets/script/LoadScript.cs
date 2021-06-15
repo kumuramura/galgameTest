@@ -8,7 +8,6 @@ using UnityEngine.UI;
 
 public class LoadScript : MonoBehaviour{
     public static LoadScript instance;
-    public CanvasGroup speakName;//用于在无人说话时隐藏名字，现删除
     public Text speakingName;//改变名字颜色
     int index;
     bool SaveCheck = false;
@@ -47,46 +46,43 @@ public class LoadScript : MonoBehaviour{
     public ScriptData loadNext()
     {
         if (index < txt.Count)
+        //如果剧本还没到底
         {
             string[] datas = txt[index].Split('#');//第index个剧本，用#分开，放入datas数组
 
-            int type = int.Parse(datas[0]);//parse对string强制转换
+            int type = int.Parse(datas[0]);//parse对string强制转换，解析出对话类型
 
             if (SaveCheck == true)
             {
                 SaveCheck = false;
-                if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+                ChangeNameColor(currentLog.name);
+                if(nowMusic.isPlaying==true)
+                   {
+                      nowMusic.Stop();
+                   }
                 return currentLog;
-            }//保存,忘了有什么用了
+            }//保存,忘了savecheck有什么用了
+            //改颜色就是用于保存（？后的改颜色
             else if(loadAndSaveInTitle.JumpFromTitle==1)
             {
                 loadAndSaveInTitle.JumpFromTitle = 0;
                 currentLog = loadAndSaveInTitle.currentLogInTitle;
                 index = loadAndSaveInTitle.index;
-                if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+                ChangeNameColor(currentLog.name);
+                
                 return currentLog;
             }
+            //该部分else if 的作用是
+            //如果玩家的从标题读取存档，从而跳转到指定对话
+            //那么我们把存档中的index跟log读取出来，返回到当前游戏界面
             else if (type == 0)
             {
                 string backpic = datas[1];
                 index++;
+                //index加一，读取后续对话
                 currentLog= new ScriptData(type, backpic);
                 
-                return new ScriptData(type, backpic);
+                return currentLog;
             }//0就构造为背景图
             else if(type==1)
             {
@@ -97,16 +93,9 @@ public class LoadScript : MonoBehaviour{
                 index++;
                 currentLog = new ScriptData(type, name, log, picname, backpic);
                 
-                if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+                ChangeNameColor(currentLog.name);
                 return currentLog;
-                //为1就构造完整
+                //为1就构造完整，建议所有对话，统一用1进行构造
             }
             else if(type==2)
             {
@@ -116,38 +105,25 @@ public class LoadScript : MonoBehaviour{
                 index++;
                 currentLog = new ScriptData(type, name, log, picname);
                 
-                if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+               ChangeNameColor(currentLog.name);
                 return currentLog;//为2就无背景图构造
-            }
+            } //不要使用，此处保留是为了以后有新内容做替代
+           
             else if(type==3)
             {
-                string option1 = datas[1];
-                string option2 = datas[2];
-                int jump1 = int.Parse(datas[3]);
-                int jump2 = int.Parse(datas[4]);
-                string name = datas[5];
+                string option1 = datas[1];//选项1的内容
+                string option2 = datas[2];//选项2的内容
+                int jump1 = int.Parse(datas[3]);//选了1，后跳多少格
+                int jump2 = int.Parse(datas[4]);//选了2，后跳多少格
+                string name = datas[5];//老四样
                 string log = datas[6];
                 string picname = datas[7];
                 string backpic = datas[8];
 
-                string[] nextLog1 = txt[index+jump1].Split('#');
-                string[] nextLog2 = txt[index + jump2].Split('#');
+                string[] nextLog1 = txt[index + jump1].Split('#');//跳转的文案
+                string[] nextLog2 = txt[index + jump2].Split('#');//跳转的文案2
 
-               if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+               ChangeNameColor(currentLog.name);//总感觉这里可以删
                 
                 //这里选项跳转的类型都为1
                 if (GameManager.choosen == 1)
@@ -155,14 +131,7 @@ public class LoadScript : MonoBehaviour{
                     index += jump1+1;//根据选项跳到指定位置，还要再+1
                     currentLog = new ScriptData(int.Parse(nextLog1[0]), nextLog1[1], nextLog1[2], nextLog1[3],nextLog1[4]);
                     
-                    if (nextLog1[1] == "海羽")
-                  {
-                     speakingName.color=new Color32(149,49,135,255);
-                  }
-                   else if(nextLog1[1] == "伦")
-                  {
-                     speakingName.color=new Color32(16,58,145,255);
-                  }//再次改一次颜色
+                    ChangeNameColor(nextLog1[1]);//再次改一次颜色
 
                     return new ScriptData(int.Parse(nextLog1[0]), nextLog1[1], nextLog1[2], nextLog1[3],nextLog1[4]);
                 }
@@ -171,14 +140,7 @@ public class LoadScript : MonoBehaviour{
                     index += jump2+1;
                     currentLog = new ScriptData(int.Parse(nextLog2[0]), nextLog2[1], nextLog2[2], nextLog2[3],nextLog2[4]);
                     
-                 if (nextLog1[1] == "海羽")
-                  {
-                     speakingName.color=new Color32(149,49,135,255);
-                  }
-                   else if(nextLog1[1] == "伦")
-                  {
-                     speakingName.color=new Color32(16,58,145,255);
-                  }
+                    ChangeNameColor(nextLog1[1]);
 
                     return new ScriptData(int.Parse(nextLog2[0]), nextLog2[1], nextLog2[2], nextLog2[3],nextLog2[4]);
                 }
@@ -197,16 +159,12 @@ public class LoadScript : MonoBehaviour{
                 currentLog = new ScriptData(type, name, log, picname);
                 
 
-                if (currentLog.name == "海羽")
-                {
-                    speakingName.color=new Color32(149,49,135,255);
-                }
-                else if(currentLog.name == "伦")
-                {
-                    speakingName.color=new Color32(16,58,145,255);
-                }
+                ChangeNameColor(currentLog.name);
                 return currentLog;
                 //为4就构造完整但下一跳会变
+                //作用是选项1的对话结束后，跳转到公共对话
+                //当然也可以用作对话的其他方式跳转，目前还没用到过
+                //这里要保证，在这句话的时候背景不改变！
             }
             else if(type==6)
             {
@@ -244,10 +202,6 @@ public class LoadScript : MonoBehaviour{
         }
     }
     
-    public void putTextOnRecord()
-    {
-
-    }
 
     private Save CreateSaveGameObject()
     {
@@ -362,5 +316,17 @@ public class LoadScript : MonoBehaviour{
         UiVisual.alpha = 0;
         UiVisual.blocksRaycasts = false;
         UiVisual.interactable = false;
+    }
+
+    private void ChangeNameColor(String CharacterName)
+    {
+        if (CharacterName == "海羽")
+                {
+                    speakingName.color=new Color32(149,49,135,255);
+                }
+                else if(CharacterName == "伦")
+                {
+                    speakingName.color=new Color32(16,58,145,255);
+                }
     }
 }
